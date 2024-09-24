@@ -9,10 +9,39 @@ Student ID  :
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
+
 
 def swap_coords(x, y):
     return (y, x)
 
+class Land():
+    def __init__(self, x_lim, y_lim, colour=None):
+        self.x_lim = x_lim
+        self.y_lim = y_lim
+        self.colour = colour
+    
+    def generate_land(self):
+        land = np.zeros((self.y_lim, self.x_lim))
+        return land
+    
+    def generate_park(self, axis):
+        width = (self.x_lim)//2 - 10
+        height = self.y_lim
+        axis.add_patch(Rectangle((0, 0), width, height, 
+                        fill=True,
+                        color="green",
+                        linewidth=2))
+        
+    def generate_residential_area(self, axis):
+        width = (self.x_lim)//2 - 10
+        height = self.y_lim
+        axis.add_patch(Rectangle(((self.x_lim)//2 + 10, 0), width, height, 
+                        fill=True,
+                        color="blue",
+                        linewidth=2))
+        
+        
 class StaticObject():
     myclass = None
     colour = "green"
