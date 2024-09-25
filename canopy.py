@@ -51,7 +51,7 @@ class StaticObject():
     size = 3
     type = None
     name = None
-    def __init__(self, x1, y1, x2, y2, size, colour, objTemp):
+    def __init__(self, x1, y1, x2, y2, size, colour, objTemp, envTemp=25):
         self.x1 = x1
         self.y1 = y1
         self.x2 = x2
@@ -60,6 +60,7 @@ class StaticObject():
         self.colour = colour
         self.objTemp = objTemp
         self.shape = None
+        self.envTemp = envTemp
         
     def plot_obj_name(self, axis):
         x = (self.x1 + self.x2) // 2
@@ -73,37 +74,45 @@ class StaticObject():
 
 class House(StaticObject):
     myclass = "House"
-    def __init__(self, x1, y1, x2, y2, size, colour, objTemp, airCond=False):
+    def __init__(self, x1, y1, x2, y2, size, colour, objTemp, envTemp, airCond=False):
         super().__init__(x1, y1, x2, y2, size, colour, objTemp)
         
-    def cal_house_temp():
+    def draw_house(self):
         pass
 
-class BigHouse(House):
-    myclass = "BigHouse"
-    def __init__(self, x1, y1, x2, y2, size, colour, objTemp, airCond):
-        super().__init__(x1, y1, x2, y2, size, colour, objTemp, airCond)
+class WorkOffice(House):
+    myclass = "WorkOffice"
+    def __init__(self, x1, y1, x2, y2, size, colour, objTemp, envTemp, airCond, time):
+        super().__init__(x1, y1, x2, y2, size, colour, objTemp, envTemp, airCond, time)
     
-    def ac_on():
-        pass
+    def ac_on(self):
+        if self.envTemp > 26 & self.time > 8 & self.time < 17:
+            self.airCond = True
+        else:
+            self.airCond = False
     
     
-    
-    def generate_bh():
-        pass
+    def __str__(self):
+        if self.airCond == True:
+            return f"The AC is on. The temperature of the building is {self.objTemp}"
+        else:
+            return f"No one in the office, and the AC is off. The temperature of the building is {self.objTemp}"
     
     
 
 class SmallHouse(House):
     myclass = "SmallHouse"
-    def __init__(self, x1, y1, x2, y2, size, colour, objTemp, airCond):
-        super().__init__(x1, y1, x2, y2, size, colour, objTemp, airCond)
+    def __init__(self, x1, y1, x2, y2, size, colour, objTemp, envTemp, airCond):
+        super().__init__(x1, y1, x2, y2, size, colour, objTemp, envTemp, airCond)
     
-    def cal_sh_temp():
-        pass
+    def cal_sh_temp(self):
+        if self.envTemp > 29:
+            self.objTemp = self.envTemp - 2
+        elif self.envTemp < 22:
+            self.objTemp = self.envTemp + 0.5
     
-    def generate_sh():
-        pass
+    def __str__(self):
+        return f"The temperature of the building is {self.objTemp}"
     
 
 
@@ -117,5 +126,9 @@ class Road(StaticObject):
     def __init__(self, x, y, axis, colour, objTemp):
         super().__init__(colour, objTemp)
         axis[x//2, 0] = self.type
+        
+        
+class Car(StaticObject):
+    pass
 
 

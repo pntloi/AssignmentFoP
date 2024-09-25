@@ -8,8 +8,8 @@ from matplotlib.patches import Rectangle
 #  this is the func that call all other stuffs to get things done
 def main():
     # define the w and h parameters
-    x_lim = 100
-    y_lim = 120
+    x_lim = 150
+    y_lim = 170
     
     fig, axis = plt.subplots(ncols=2)
     
