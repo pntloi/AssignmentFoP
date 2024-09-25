@@ -19,7 +19,8 @@ class Land():
     def __init__(self, x_lim, y_lim, colour=None):
         self.x_lim = x_lim
         self.y_lim = y_lim
-        self.colour = colour
+        self.colour = ["red", "green", "blue"]
+        self.initialTemp = 25
     
     def generate_land(self):
         land = np.zeros((self.y_lim, self.x_lim))
@@ -30,7 +31,7 @@ class Land():
         height = self.y_lim
         axis.add_patch(Rectangle((0, 0), width, height, 
                         fill=True,
-                        color="green",
+                        color=self.colour[1],
                         linewidth=2))
         
     def generate_residential_area(self, axis):
@@ -38,9 +39,11 @@ class Land():
         height = self.y_lim
         axis.add_patch(Rectangle(((self.x_lim)//2 + 10, 0), width, height, 
                         fill=True,
-                        color="blue",
+                        color=self.colour[2],
                         linewidth=2))
         
+    def __str__(self):
+        return f"The initial temperature is {self.initialTemp} degree. And the width of the land is {self.x_lim} meters and the height of the land is {self.y_lim} meters"
         
 class StaticObject():
     myclass = None
@@ -68,11 +71,51 @@ class StaticObject():
         area[self.x1:self.x2, self.y1:self.y2] = self.type
 
 
-class Road(StaticObject):
-    pass
+class House(StaticObject):
+    myclass = "House"
+    def __init__(self, x1, y1, x2, y2, size, colour, objTemp, airCond=False):
+        super().__init__(x1, y1, x2, y2, size, colour, objTemp)
+        
+    def cal_house_temp():
+        pass
+
+class BigHouse(House):
+    myclass = "BigHouse"
+    def __init__(self, x1, y1, x2, y2, size, colour, objTemp, airCond):
+        super().__init__(x1, y1, x2, y2, size, colour, objTemp, airCond)
+    
+    def ac_on():
+        pass
+    
+    
+    
+    def generate_bh():
+        pass
+    
+    
+
+class SmallHouse(House):
+    myclass = "SmallHouse"
+    def __init__(self, x1, y1, x2, y2, size, colour, objTemp, airCond):
+        super().__init__(x1, y1, x2, y2, size, colour, objTemp, airCond)
+    
+    def cal_sh_temp():
+        pass
+    
+    def generate_sh():
+        pass
+    
+
 
 class Tree(StaticObject):
+    myclass = "Tree"
     pass
 
-class House(StaticObject):
-    pass
+class Road(StaticObject):
+    myclass = "Road"
+    type = 3
+    def __init__(self, x, y, axis, colour, objTemp):
+        super().__init__(colour, objTemp)
+        axis[x//2, 0] = self.type
+
+

@@ -17,14 +17,14 @@ def main():
     
     land_RGB = Land(x_lim, y_lim)
     landview_RGB = land_RGB.generate_land()
-    park_RGB = land_RGB.generate_park(ax1)
-    print(park_RGB)
-    residential_RGB = land_RGB.generate_residential_area(ax1)
-    print(residential_RGB)
+    
+    land_RGB.generate_park(ax1) # Generate park
+    land_RGB.generate_residential_area(ax1) # Generate residential area
+    
+    
     
     im1 = ax1.imshow(landview_RGB)
     fig.colorbar(im1)
-    
     
     plt.show()
 
