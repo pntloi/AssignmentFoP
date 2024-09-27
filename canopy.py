@@ -52,7 +52,7 @@ class Land():
                                 color=self.colour[1],
                                 linewidth=3))
             else:
-                width -= - 0.5
+                width -= 0.5
                 starting_point += 0.5
                 axis.add_patch(Rectangle((starting_point, part), width, 10, 
                                 fill=True,
@@ -60,8 +60,9 @@ class Land():
                                 linewidth=3))
         
     def generate_road_line(self, axis):
-        road = Road(axis, 25)
+        road = Road(self.x_lim, self.y_lim, axis, 25)
         road.draw_line()
+        
         
     def __str__(self):
         return f"The initial temperature is {self.initialTemp} degree. And the width of the land is {self.x_lim} meters and the height of the land is {self.y_lim} meters"
@@ -72,11 +73,10 @@ class StaticObject():
     size = 3
     type = None
     name = None
-    def __init__(self, x1, y1, x2, y2, size, colour, objTemp, envTemp=25):
-        self.x1 = x1
-        self.y1 = y1
-        self.x2 = x2
-        self.y2 = y2
+    def __init__(self, x, y, axis, size, colour, objTemp, envTemp=25):
+        self.x = x
+        self.y = y
+        self.axis = axis
         self.size = size
         self.colour = colour
         self.objTemp = objTemp
@@ -90,21 +90,24 @@ class StaticObject():
         axis.text(x, y, f"{self.name}", color="Black")
         
     def draw_obj(self, area):
-        area[self.x1:self.x2, self.y1:self.y2] = self.type
+        area[self.x:self.x + self.size, self.y:self.y + self.size] = self.type
 
 
 class House(StaticObject):
     myclass = "House"
-    def __init__(self, x1, y1, x2, y2, size, colour, objTemp, envTemp, airCond=False):
-        super().__init__(x1, y1, x2, y2, size, colour, objTemp)
+    def __init__(self, x, y, axis, size, colour, objTemp, envTemp, airCond=False):
+        super().__init__(x, y, axis, size, colour, objTemp, envTemp)
         
     def draw_house(self):
         pass
 
 class WorkOffice(House):
     myclass = "WorkOffice"
-    def __init__(self, x1, y1, x2, y2, size, colour, objTemp, envTemp, airCond, time):
-        super().__init__(x1, y1, x2, y2, size, colour, objTemp, envTemp, airCond, time)
+    def __init__(self, x, y, axis, width, height, colour, objTemp, envTemp, airCond, time):
+        super().__init__(x, y, axis, colour, objTemp, envTemp, airCond)
+        self.width = width
+        self.height = height
+        self.time = time
     
     def ac_on(self):
         if self.envTemp > 26 & self.time > 8 & self.time < 17:
@@ -123,8 +126,9 @@ class WorkOffice(House):
 
 class SmallHouse(House):
     myclass = "SmallHouse"
-    def __init__(self, x1, y1, x2, y2, size, colour, objTemp, envTemp, airCond):
-        super().__init__(x1, y1, x2, y2, size, colour, objTemp, envTemp, airCond)
+    type = 2
+    def __init__(self, x, y, axis, size, colour, objTemp, envTemp, airCond):
+        super().__init__(x, y, axis, size, colour, objTemp, envTemp, airCond)
     
     def cal_sh_temp(self):
         if self.envTemp > 29:
@@ -132,6 +136,13 @@ class SmallHouse(House):
         elif self.envTemp < 22:
             self.objTemp = self.envTemp + 0.5
     
+    def add_small_house(self, numSmallHouse):
+        for sh in range(numSmallHouse):
+            self.axis[self.x:self.x + self.size, self.y:self.y + self.size] = self.type
+            
+            
+            
+            
     def __str__(self):
         return f"The temperature of the building is {self.objTemp}"
     
@@ -144,18 +155,22 @@ class Tree(StaticObject):
 class Road():
     myclass = "Road"
     type = 3
-    def __init__(self, axis, objTemp):
+    def __init__(self, x_lim, y_lim, axis, objTemp):
+        self.x_lim = x_lim
+        self.y_lim = y_lim
         self.axis = axis
         self.objTemp = objTemp
         
     def draw_line(self):
-        x_rl = [98, 84]
-        y_rl = [0, 180]
+            
+        x_rl = [self.x_lim//2 + 8, self.x_lim//2 - 6]
+        y_rl = [0, self.y_lim]
         
-        x_left_road = [81, 67]
-        y_left_road = [0, 180]
-        x_right_road = [115, 100]
-        y_right_road = [0, 180]
+        x_left_road = [self.x_lim//2 - 9, self.x_lim//2 - 23]
+        y_left_road = [0, self.y_lim]
+        
+        x_right_road = [self.x_lim//2 + 25, self.x_lim//2 + 10]
+        y_right_road = [0, self.y_lim]
         
         self.axis.plot(x_rl, y_rl, 'g--', color="white")
         self.axis.plot(x_left_road, y_left_road, color="black")
