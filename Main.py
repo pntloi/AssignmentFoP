@@ -104,7 +104,9 @@ def main():
         # Create view
         for sim in range(SIMULATION_NB):
             create_view(SMALL_HOUSE_NB, WORKOFFICE_NB, TREE_NB, time)
-            set_timer(time)
+            time += 1
+            if time > 23:
+                time = 0
             
         
     except TimeoutError as e:
