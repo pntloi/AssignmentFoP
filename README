@@ -1,0 +1,20 @@
+## Synopsis
+Assignment - Create RGB map view and Thermal map view
+ 
+## Contents
+README – This folder contains all activities in the Practical Test 03
+Adding main.py
+
+Adding canopy.py
+ 
+## Dependencies
+matplotlib
+numpy
+canopy
+time
+math
+bitranox/wrapt-timeout-decorator
+ 
+## Version information
+<18-09-2024> - initial version of the Assignment
+<23-09-2024>

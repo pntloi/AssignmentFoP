@@ -12,7 +12,7 @@ from matplotlib.patches import Circle, Ellipse, Polygon, Rectangle
 
 ### Land class to generate the mapview
 class Land():
-    def __init__(self, x_lim=180, y_lim=180, land_temp=25, road_temp=30, road_color="gray", residential_area_color="sandybrown", park_color="lightgreen"):
+    def __init__(self, x_lim=180, y_lim=180, land_temp=25, road_temp=25, road_color="gray", residential_area_color="sandybrown", park_color="lightgreen"):
         self.x_lim = x_lim # x limit of the land
         self.y_lim = y_lim # y limit of the land
         self.road_color = road_color 
@@ -91,7 +91,6 @@ class Land():
                 obj = SmallHouse(self.residential_area)
             elif name == "Tree":
                 obj = Tree(self.park)
-
             pointer = 0
             if name in ["WorkOffice", "SmallHouse"]:
                 for o in self.houses:
@@ -111,6 +110,7 @@ class Land():
                 if not self.houses:
                     count += 1
                     self.houses.append(obj)
+                    print(f"The temp of {name} is {obj.temp} degree")
             elif name == "Tree":
                 for o in self.trees:
                     # d is the distance between 2 trees
@@ -129,6 +129,7 @@ class Land():
                 if not self.trees:
                     count += 1
                     self.trees.append(obj)
+                    print(f"The temp of {name} is {obj.temp} degree")
             # Stop condition
             if count == nb:
                 break
@@ -206,7 +207,7 @@ class Land():
         return axis
 
     def __str__(self):
-        return f"The temperature is {self.land_temp} degree. And the width of the land is {self.x_lim} meters and the height of the land is {self.y_lim} meters"
+        print(f"The temperature is {self.land_temp} degree. And the width of the land is {self.x_lim} meters and the height of the land is {self.y_lim} meters")
 
 
 class StaticObject():
@@ -271,9 +272,9 @@ class WorkOffice(House):
     
     def __str__(self):
         if self.airCond == True:
-            return f"The AC is on. The temperature of the building is {self.temp}"
+            print(f"The AC is on. The temperature of the building is {self.temp}")
         else:
-            return f"No one in the office, and the AC is off. The temperature of the building is {self.temp}"
+            print(f"No one in the office, and the AC is off. The temperature of the building is {self.temp}")
 
 
 class SmallHouse(House):
@@ -299,10 +300,13 @@ class Tree(StaticObject):
     def __init__(self, area, size=[3, 3], color="g", temp=25):
         super().__init__(size, color, temp)
         self._init_pos(area)
-    
+
     def _init_pos(self, area):
+        #
         A = (area["tl"][1] - area["bl"][1])/(area["tl"][0] - area["bl"][0])
+        #
         b = area["tl"][1] - A*area["tl"][0]
+        #
         x_min = area["tl"][0] if area["tl"][0] >= area["bl"][0] else area["bl"][0]
         x_max = area["tr"][0]
         y_min = area["tr"][1]
@@ -318,10 +322,11 @@ class Tree(StaticObject):
                 break
         self.x = x
         self.y = y
-        
+    # If the temp of the environment > 28 the tree can cool themself, their temp reduce by 3 degree
+    # If the temp of the environment < 22 the tree can warm themself, their temp increase by 2 degree
     def env_update(self, env_temp, env_time):
         if env_temp > 28:
-            self.temp = env_temp - 4
+            self.temp = env_temp - 3
         elif env_temp < 22:
             self.temp = env_temp + 2
         else:
