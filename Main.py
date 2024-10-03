@@ -28,7 +28,6 @@ def create_view(SMALL_HOUSE_NB, WORKOFFICE_NB, TREE_NB, TIME):
     ax1.set_ylim([0, land.y_lim])
     
     land.env_update(TIME)
-    
     # Set up thermal view
     t_min = 20
     t_max = 35
@@ -47,6 +46,10 @@ def create_view(SMALL_HOUSE_NB, WORKOFFICE_NB, TREE_NB, TIME):
     plt.show(block=False)
     plt.pause(3)
     plt.close()
+    
+    print(f"The time is {TIME} oclock")
+    
+    
 
 def input_data(name, var):
     if name == "SIMULATION_NB":
@@ -62,7 +65,7 @@ def input_data(name, var):
     
     # Input the data
     if var_name == "TIME":
-        while var < 0 & var > 24:
+        while var < 0 & var > 23:
             try:
                 var = int(input(f"Please enter the {var_name}: ")) 
             except:
@@ -77,13 +80,18 @@ def input_data(name, var):
                     var = int(input(f"Please enter the {var_name}: "))
     return var
 
+def set_timer(time):
+    time += 1
+    if time > 23:
+        time = 0
+
 #  this is the func that call all other stuffs to get things done
 def main():
     SIMULATION_NB = 0
     SMALL_HOUSE_NB = 0
     WORKOFFICE_NB = 0
     TREE_NB = 0
-    TIME = 0
+    time = 0
     
     try:
         # Input the number of simulation/smallhouse/workoffice/tree
@@ -91,11 +99,13 @@ def main():
         SMALL_HOUSE_NB = input_data("SMALL_HOUSE_NB", SMALL_HOUSE_NB)
         WORKOFFICE_NB = input_data("WORKOFFICE_NB", WORKOFFICE_NB)
         TREE_NB = input_data("TREE_NB", TREE_NB)
-        TIME = input_data("TIME", TIME)
+        time = input_data("TIME", time)
         
         # Create view
         for sim in range(SIMULATION_NB):
-            create_view(SMALL_HOUSE_NB, WORKOFFICE_NB, TREE_NB, TIME)
+            create_view(SMALL_HOUSE_NB, WORKOFFICE_NB, TREE_NB, time)
+            set_timer(time)
+            
         
     except TimeoutError as e:
         print(f"Not enough space on the map: {e}\n Please reduce the number of houses or trees")

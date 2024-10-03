@@ -40,9 +40,10 @@ class Land():
 
     # Update initial temp/time of the env
     ## Initial time: 0h, Initial temp: 25 degrees
+    ## 29C at 8AM, 37C at 12PM, 25C at 12AM
     def env_update(self, env_time):
         temp_clock = np.array([0.5,]*8 + [2,]*4 + [-1,]*12)
-        time_0 = 8
+        time_0 = 0
         temp_0 = 25
 
         self.land_temp = round(temp_0 + temp_clock[:(env_time - time_0)].sum())
@@ -326,7 +327,7 @@ class Tree(StaticObject):
     # If the temp of the environment < 22 the tree can warm themself, their temp increase by 2 degree
     def env_update(self, env_temp, env_time):
         if env_temp > 28:
-            self.temp = env_temp - 3
+            self.temp = env_temp - 2
         elif env_temp < 22:
             self.temp = env_temp + 2
         else:
