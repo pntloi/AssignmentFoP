@@ -10,8 +10,9 @@ import numpy as np
 import math
 from matplotlib.patches import Circle, Ellipse, Polygon, Rectangle
 
-### Land class to generate the mapview
+### 1.1 Land class to generate the mapview
 class Land():
+    # Constructor of the class Land
     def __init__(self, x_lim=180, y_lim=180, land_temp=25, road_temp=25, road_color="gray", residential_area_color="sandybrown", park_color="lightgreen"):
         self.x_lim = x_lim # x limit of the land
         self.y_lim = y_lim # y limit of the land
@@ -21,63 +22,6 @@ class Land():
         self.land_temp = land_temp
         self.road_temp = road_temp
         self.generate()
-
-    # Generate map's road/park/residential area
-    def generate(self):
-        self._generate_road()
-        self._generate_park()
-        self._generate_residential_area()
-
-    # Init small houses/workoffice/trees
-    ## Input: number of big houses/small houses/trees
-    def init_objects(self, small_house_nb, big_house_nb, tree_nb):
-        self.houses = [] 
-        self.trees = []
-        
-        self.init_components("WorkOffice", big_house_nb)
-        self.init_components("SmallHouse", small_house_nb)
-        self.init_components("Tree", tree_nb)
-
-    # Update initial temp/time of the env
-    ## Initial time: 0h, Initial temp: 25 degrees
-    ## 29C at 8AM, 37C at 12PM, 25C at 12AM
-    def env_update(self, env_time):
-        temp_clock = np.array([0.5,]*8 + [2,]*4 + [-1,]*12)
-        time_0 = 0
-        temp_0 = 25
-
-        self.land_temp = round(temp_0 + temp_clock[:(env_time - time_0)].sum())
-        self.road_temp = self.land_temp
-
-        if self.houses or self.trees:
-            for o in (self.houses + self.trees):
-                o.env_update(self.land_temp, env_time)
-
-    # Plot RGB road/park/residential area
-    ## Using recursion to plot objects to RGB map
-    def plot(self, axis):
-        axis = self._plot_road(axis)
-        axis = self._plot_area("residential_area", self.residential_area_color, axis)
-        axis = self._plot_area("park", self.park_color, axis)
-        if self.houses or self.trees:
-            for o in (self.houses + self.trees):
-                axis = o.plot(axis)
-        else:
-            print("No houses or trees have been created yet.")
-        return axis
-
-    # Plot thermal map road/park/residential area
-    ## Using recursion to plot objects to the thermal map
-    def plot_thermal(self, axis, ScalarMappable):
-        axis = self._plot_thermal("road", axis, ScalarMappable)
-        axis = self._plot_thermal("residential_area", axis, ScalarMappable)
-        axis = self._plot_thermal("park", axis, ScalarMappable)
-        if self.houses or self.trees:
-            for o in (self.houses + self.trees):
-                axis = o.plot_thermal(axis, ScalarMappable)
-        else:
-            print("No houses or trees have been created yet.")
-        return axis
     
     # Create component's objects()
     ## Input: name of the component, their amounts
@@ -134,6 +78,16 @@ class Land():
             # Stop condition
             if count == nb:
                 break
+            
+    # Init small houses/workoffice/trees
+    ## Input: number of big houses/small houses/trees
+    def init_objects(self, small_house_nb, big_house_nb, tree_nb):
+        self.houses = [] 
+        self.trees = []
+        
+        self.init_components("WorkOffice", big_house_nb)
+        self.init_components("SmallHouse", small_house_nb)
+        self.init_components("Tree", tree_nb)
 
     # Topleft/topright/bottomright/bottomleft of the park
     def _generate_park(self):
@@ -165,15 +119,14 @@ class Land():
                     "br": (round(x_road_bottom[1]), self.y_lim),
                     "bl": (round(x_road_bottom[0]), self.y_lim)}
 
-    # Plot residential/park area on RGB map
-    def _plot_area(self, obj_name, obj_color, axis):
-        obj = getattr(self, obj_name)
-        coors_as_poly = list(obj.values())
-        axis.add_patch(Polygon(coors_as_poly, fill=True, color=obj_color))
-        return axis
+    # Generate map's road/park/residential area
+    def generate(self):
+        self._generate_road()
+        self._generate_park()
+        self._generate_residential_area()
     
     # Plot residential/park area on thermal map
-    def _plot_thermal(self, obj_name, axis, ScalarMappable):
+    def plot_thermal_objects(self, obj_name, axis, ScalarMappable):
         obj = getattr(self, obj_name)
         if obj_name == "road":
             temp = self.road_temp
@@ -207,6 +160,54 @@ class Land():
         axis.plot(x_right_road, y_right_road, color="black")
         return axis
 
+    # Plot residential/park area on RGB map
+    def _plot_area(self, obj_name, obj_color, axis):
+        obj = getattr(self, obj_name)
+        coors_as_poly = list(obj.values())
+        axis.add_patch(Polygon(coors_as_poly, fill=True, color=obj_color))
+        return axis
+
+    # Update initial temp/time of the env
+    ## Initial time: 0h, Initial temp: 25 degrees
+    ## 29C at 8AM, 37C at 12PM, 25C at 12AM
+    def env_update(self, env_time):
+        temp_clock = np.array([0.5,]*8 + [2,]*4 + [-1,]*12)
+        time_0 = 0
+        temp_0 = 25
+
+        self.land_temp = round(temp_0 + temp_clock[:(env_time - time_0)].sum())
+        self.road_temp = self.land_temp
+
+        if self.houses or self.trees:
+            for o in (self.houses + self.trees):
+                o.env_update(self.land_temp, env_time)
+
+    # Plot RGB road/park/residential area
+    ## Using recursion to plot objects to RGB map
+    def plot_RGB(self, axis):
+        axis = self._plot_road(axis)
+        axis = self._plot_area("residential_area", self.residential_area_color, axis)
+        axis = self._plot_area("park", self.park_color, axis)
+        if self.houses or self.trees:
+            for o in (self.houses + self.trees):
+                axis = o.plot(axis)
+        else:
+            print("No houses or trees have been created yet.")
+        return axis
+
+    # Plot thermal map road/park/residential area
+    ## Using recursion to plot objects to the thermal map
+    def plot_thermal(self, axis, ScalarMappable):
+        axis = self.plot_thermal_objects("road", axis, ScalarMappable)
+        axis = self.plot_thermal_objects("residential_area", axis, ScalarMappable)
+        axis = self.plot_thermal_objects("park", axis, ScalarMappable)
+        if self.houses or self.trees:
+            for o in (self.houses + self.trees):
+                axis = o.plot_thermal(axis, ScalarMappable)
+        else:
+            print("No houses or trees have been created yet.")
+        return axis
+    
     def __str__(self):
         print(f"The temperature is {self.land_temp} degree. And the width of the land is {self.x_lim} meters and the height of the land is {self.y_lim} meters")
 

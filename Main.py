@@ -23,7 +23,7 @@ def create_view(SMALL_HOUSE_NB, WORKOFFICE_NB, TREE_NB, TIME):
     land = Land()
     land.init_objects(SMALL_HOUSE_NB, WORKOFFICE_NB, TREE_NB)
     
-    ax1 = land.plot(ax1)
+    ax1 = land.plot_RGB(ax1)
     ax1.set_title("RGB view")
     ax1.set_xlim([0, land.x_lim])
     ax1.set_ylim([0, land.y_lim])
@@ -49,9 +49,6 @@ def create_view(SMALL_HOUSE_NB, WORKOFFICE_NB, TREE_NB, TIME):
     
     plt.pause(3)
     plt.close()
-    
-    
-    
     
 
 def input_data(name, var):
