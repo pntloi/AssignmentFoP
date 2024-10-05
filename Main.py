@@ -10,9 +10,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from matplotlib.colors import Normalize
+import matplotlib.colors as mcolors
 from canopy import *
 from wrapt_timeout_decorator import *
-import matplotlib.colors as mcolors
+
 
 @timeout(5)
 def create_view(SMALL_HOUSE_NB, WORKOFFICE_NB, TREE_NB, TIME):
@@ -44,10 +45,12 @@ def create_view(SMALL_HOUSE_NB, WORKOFFICE_NB, TREE_NB, TIME):
     
     plt.colorbar(sm, ax = ax2)
     plt.show(block=False)
+    print(f"The time is {TIME} oclock")
+    
     plt.pause(3)
     plt.close()
     
-    print(f"The time is {TIME} oclock")
+    
     
     
 
@@ -64,8 +67,8 @@ def input_data(name, var):
         var_name = "time"    
     
     # Input the data
-    if var_name == "TIME":
-        while var < 0 & var > 23:
+    if var_name == "time":
+        while var < 0 or var > 23:
             try:
                 var = int(input(f"Please enter the {var_name}: ")) 
             except:
@@ -80,18 +83,13 @@ def input_data(name, var):
                     var = int(input(f"Please enter the {var_name}: "))
     return var
 
-def set_timer(time):
-    time += 1
-    if time > 23:
-        time = 0
-
 #  this is the func that call all other stuffs to get things done
 def main():
     SIMULATION_NB = 0
     SMALL_HOUSE_NB = 0
     WORKOFFICE_NB = 0
     TREE_NB = 0
-    time = 0
+    time = -1
     
     try:
         # Input the number of simulation/smallhouse/workoffice/tree
