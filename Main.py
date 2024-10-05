@@ -105,8 +105,8 @@ def main():
                 time = 0
             
         
-    except TimeoutError as e:
-        print(f"Not enough space on the map: {e}\n Please reduce the number of houses or trees")
+    except (TimeoutError, ZeroDivisionError) as e:
+        print(f"An error occurs {e}\n Please try again")
 
 
 # This runs the Python file (in case u dont know type python3 file name)
