@@ -15,6 +15,7 @@ from canopy import *
 from wrapt_timeout_decorator import *
 
 
+# 3.1 code ref
 @timeout(5)
 def create_view(SMALL_HOUSE_NB, WORKOFFICE_NB, TREE_NB, TIME):
     fig, axis = plt.subplots(ncols=2)

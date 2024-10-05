@@ -10,7 +10,7 @@ import numpy as np
 import math
 from matplotlib.patches import Circle, Ellipse, Polygon, Rectangle
 
-### 1.1 Land class to generate the mapview
+# 1.1 code ref
 class Land():
     # Constructor of the class Land
     def __init__(self, x_lim=180, y_lim=180, land_temp=25, road_temp=25, road_color="gray", residential_area_color="sandybrown", park_color="lightgreen"):
@@ -23,7 +23,7 @@ class Land():
         self.road_temp = road_temp
         self.generate()
     
-    # Create component's objects()
+    # 1.1.1 code ref
     ## Input: name of the component, their amounts
     def init_components(self, name, nb):
         # Number of objects
@@ -79,7 +79,7 @@ class Land():
             if count == nb:
                 break
             
-    # Init small houses/workoffice/trees
+    # 1.1.2 code ref
     ## Input: number of big houses/small houses/trees
     def init_objects(self, small_house_nb, big_house_nb, tree_nb):
         self.houses = [] 
@@ -89,21 +89,24 @@ class Land():
         self.init_components("SmallHouse", small_house_nb)
         self.init_components("Tree", tree_nb)
 
-    # Topleft/topright/bottomright/bottomleft of the park
+    # 1.1.3 code ref
+    ## Topleft/topright/bottomright/bottomleft of the park
     def _generate_park(self):
         self.park = {"tl": (self.road["tr"][0] + 1, 0),
                     "tr": (self.x_lim, 0),
                     "br": (self.x_lim, self.y_lim),
                     "bl": (self.road["br"][0] + 1, self.y_lim)}
 
-    # Topleft/topright/bottomright/bottomleft of the residential area
+    # 1.1.4 code ref
+    ## Topleft/topright/bottomright/bottomleft of the residential area
     def _generate_residential_area(self):
         self.residential_area = {"tl": (0, 0),
                                 "tr": (self.road["tl"][0] - 1, 0),
                                 "br": (self.road["bl"][0] - 1, self.y_lim),
                                 "bl": (0, self.y_lim)}
 
-    # Generate road based on a random angle
+    # 1.1.5 code ref
+    ## Generate road based on a random angle
     def _generate_road(self):
         angle = np.array((np.random.rand() - 0.5)*np.pi/6 + np.pi/2)
         x_road_range = round((np.random.rand()*0.1 + 0.1)*self.x_lim)
@@ -119,13 +122,15 @@ class Land():
                     "br": (round(x_road_bottom[1]), self.y_lim),
                     "bl": (round(x_road_bottom[0]), self.y_lim)}
 
-    # Generate map's road/park/residential area
+    # 1.1.6 code ref
+    ## Generate map's road/park/residential area
     def generate(self):
         self._generate_road()
         self._generate_park()
         self._generate_residential_area()
     
-    # Plot residential/park area on thermal map
+    # 1.1.7 code ref
+    ## Using attribute in 1.1.3, 1.1.4, 1.1.5 to plot thermal map
     def plot_thermal_objects(self, obj_name, axis, ScalarMappable):
         obj = getattr(self, obj_name)
         if obj_name == "road":
@@ -144,6 +149,8 @@ class Land():
             axis.add_patch(Polygon(coors_as_poly, fill=True, color=ScalarMappable.get_cmap()(temp)))
         return axis
     
+    # 1.1.8 code ref
+    ## Using attribute in 1.1.3, 1.1.4, 1.1.5 to plot the road RGB map
     def _plot_road(self, axis):
         axis = self._plot_area("road", self.road_color, axis)
         # Middle break line of the road
@@ -160,43 +167,29 @@ class Land():
         axis.plot(x_right_road, y_right_road, color="black")
         return axis
 
-    # Plot residential/park area on RGB map
+    # 1.1.9 code ref
+    ## Use to plot residential area/park area
     def _plot_area(self, obj_name, obj_color, axis):
         obj = getattr(self, obj_name)
         coors_as_poly = list(obj.values())
         axis.add_patch(Polygon(coors_as_poly, fill=True, color=obj_color))
         return axis
 
-    # Update initial temp/time of the env
-    ## Initial time: 0h, Initial temp: 25 degrees
-    ## 29C at 8AM, 37C at 12PM, 25C at 12AM
-    def env_update(self, env_time):
-        temp_clock = np.array([0.5,]*8 + [2,]*4 + [-1,]*12)
-        time_0 = 0
-        temp_0 = 25
-
-        self.land_temp = round(temp_0 + temp_clock[:(env_time - time_0)].sum())
-        self.road_temp = self.land_temp
-
-        if self.houses or self.trees:
-            for o in (self.houses + self.trees):
-                o.env_update(self.land_temp, env_time)
-
-    # Plot RGB road/park/residential area
-    ## Using recursion to plot objects to RGB map
+    # 1.1.10 code ref
+    ## Plot the areas and the components into the RGB map
     def plot_RGB(self, axis):
         axis = self._plot_road(axis)
         axis = self._plot_area("residential_area", self.residential_area_color, axis)
         axis = self._plot_area("park", self.park_color, axis)
         if self.houses or self.trees:
             for o in (self.houses + self.trees):
-                axis = o.plot(axis)
+                axis = o.plot_RGB(axis)
         else:
             print("No houses or trees have been created yet.")
-        return axis
+        return axis 
 
-    # Plot thermal map road/park/residential area
-    ## Using recursion to plot objects to the thermal map
+    # 1.1.11 code ref
+    ## Plot the areas and the components into the map
     def plot_thermal(self, axis, ScalarMappable):
         axis = self.plot_thermal_objects("road", axis, ScalarMappable)
         axis = self.plot_thermal_objects("residential_area", axis, ScalarMappable)
@@ -208,10 +201,25 @@ class Land():
             print("No houses or trees have been created yet.")
         return axis
     
+    # 2.1 code ref
+    ## Initial temp: 25 degrees
+    ## 29C at 8 oclock, 37C at 12 oclock, 25C at 0 oclock
+    def env_update(self, env_time):
+        temp_clock = np.array([0.5,]*8 + [2,]*4 + [-1,]*12)
+        time_0 = 0
+        temp_0 = 25
+
+        self.land_temp = round(temp_0 + temp_clock[:(env_time - time_0)].sum())
+        self.road_temp = self.land_temp
+
+        if self.houses or self.trees:
+            for o in (self.houses + self.trees):
+                o.env_update(self.land_temp, env_time)
+    
     def __str__(self):
         print(f"The temperature is {self.land_temp} degree. And the width of the land is {self.x_lim} meters and the height of the land is {self.y_lim} meters")
 
-
+# 1.2 code ref
 class StaticObject():
     def __init__(self, size=[10, 10], color="k", temp=24):
         self.color = color
@@ -220,12 +228,12 @@ class StaticObject():
         self.height = size[1]
         # Calculate the radius of the circle around the obj 
         self.circular_space = math.sqrt((self.width/2)**2 + (self.height/2)**2)
-
+# 1.3 code ref
 class House(StaticObject):
     def __init__(self, area, size=[10, 10], color="k", temp=24):
         super().__init__(size, color, temp)
         self._init_pos(area)
-    
+    # 1.3.1 code ref
     def _init_pos(self, area):
         A = (area["tr"][1] - area["br"][1])/(area["tr"][0] - area["br"][0])
         b = area["tr"][1] - A*area["tr"][0]
@@ -235,6 +243,7 @@ class House(StaticObject):
         
         y_min = area["tr"][1]
         y_max = area["br"][1]
+        
         while 1:
             x = np.random.randint(x_min, x_max - self.width)
             y = np.random.randint(y_min, y_max - self.height)
@@ -246,11 +255,13 @@ class House(StaticObject):
                 break
         self.x = x
         self.y = y
-
-    def plot(self, axis):
+        
+    # 1.3.2 code ref
+    def plot_RGB(self, axis):
         axis.add_patch(Rectangle((self.x, self.y), self.width, self.height, fill=True, color=self.color))
         return axis
-
+    
+    # 1.3.3 code ref
     def plot_thermal(self, axis, ScalarMappable):
         temp_as_cmap = (self.temp - ScalarMappable.norm.vmin)/ScalarMappable.norm.vmax
         axis.add_patch(Rectangle((self.x, self.y), self.width, self.height,
@@ -258,12 +269,13 @@ class House(StaticObject):
                                 facecolor=ScalarMappable.get_cmap()(temp_as_cmap)))
         return axis
 
+# 1.4 code ref
 class WorkOffice(House):
     def __init__(self, area, size=[15, 30], color="m", temp=25, airCond=24):
         super().__init__(area, size, color, temp)
         self.airCond = airCond
     
-    # Update the temp of the Office
+    # 2.2 code ref
     ## If the temperature of the environment more than 26, and in the working hours(8AM to 5PM) 
     ## -> the temp of the building = temp of the air cond
     def env_update(self, env_temp, env_time):
@@ -278,11 +290,12 @@ class WorkOffice(House):
         else:
             print(f"No one in the office, and the AC is off. The temperature of the building is {self.temp}")
 
-
+# 1.5 code ref
 class SmallHouse(House):
     def __init__(self, area, size=[10, 10], color="c", temp=25):
         super().__init__(area, size, color, temp)
 
+    # 2.3 code ref
     # Small house don't have air cond. 
     ## When the temperature of the environment > 29 -> The house cooler 2 degrees than the env
     ## When the temperature of the environment < 22 -> The house warmer 0.5 degrees than the env
@@ -297,22 +310,23 @@ class SmallHouse(House):
     def __str__(self):
         return f"The temperature of the building is {self.temp}"
 
-
+# 1.6 code ref
 class Tree(StaticObject):
     def __init__(self, area, size=[3, 3], color="g", temp=25):
         super().__init__(size, color, temp)
         self._init_pos(area)
-
+    # 1.6.1 code ref
     def _init_pos(self, area):
-        #
+        # 
         A = (area["tl"][1] - area["bl"][1])/(area["tl"][0] - area["bl"][0])
-        #
         b = area["tl"][1] - A*area["tl"][0]
-        #
+        
         x_min = area["tl"][0] if area["tl"][0] >= area["bl"][0] else area["bl"][0]
         x_max = area["tr"][0]
+        
         y_min = area["tr"][1]
         y_max = area["br"][1]
+        
         while 1:
             x = np.random.randint(x_min, x_max - self.width)
             y = np.random.randint(y_min, y_max - self.height)
@@ -324,8 +338,10 @@ class Tree(StaticObject):
                 break
         self.x = x
         self.y = y
-    # If the temp of the environment > 28 the tree can cool themself, their temp reduce by 3 degree
-    # If the temp of the environment < 22 the tree can warm themself, their temp increase by 2 degree
+    
+    # 
+    ## If the temp of the environment > 28 the tree can cool themself, their temp reduce by 3 degree
+    ## If the temp of the environment < 22 the tree can warm themself, their temp increase by 2 degree
     def env_update(self, env_temp, env_time):
         if env_temp > 28:
             self.temp = env_temp - 2
@@ -334,13 +350,15 @@ class Tree(StaticObject):
         else:
             self.temp = env_temp
 
-    def plot(self, axis):
+
+    # 1.6.2 code ref
+    def plot_RGB(self, axis):
         if self.width != self.height:
             axis.add_patch(Ellipse((self.x + self.width/2, self.y + self.height/2), self.width, self.height, fill=True, color=self.color))
         else:
             axis.add_patch(Circle((self.x + self.width/2, self.y + self.height/2), radius=self.width, fill=True, color=self.color))
         return axis
-    
+    # 1.6.3 code ref
     def plot_thermal(self, axis, ScalarMappable):
         temp_as_cmap = (self.temp - ScalarMappable.norm.vmin)/ScalarMappable.norm.vmax
         if self.width != self.height:
